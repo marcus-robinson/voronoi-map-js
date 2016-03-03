@@ -352,7 +352,11 @@ function initializeUi () {
 // Main
 
 function main() {
+    
+    console.log("I'm alive!");
+
     console.time('total');
+    
 
     initializeUi();
 

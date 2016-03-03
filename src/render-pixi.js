@@ -14,7 +14,19 @@ var pointCore = require('./as3/point-core');
 var Shape = require('shape2d');
 var NoiseFilter = require('pixi-noise-filter');
 
-exports.graphicsReset = function (context, mapWidth, mapHeight, displayColors) {
+exports.createNewCanvasContext = function (mapWidth, mapHeight) {
+    return { renderer: new PIXI.CanvasRenderer(mapWidth, mapHeight) };
+}
+
+exports.createNewWebGLContext = function (mapWidth, mapHeight) {
+    return { renderer: new PIXI.WebGLRenderer(mapWidth, mapHeight) };
+}
+
+exports.createNewContext = function (mapWidth, mapHeight) {
+    return { renderer: new PIXI.autoDetectRenderer(mapWidth, mapHeight) };
+}
+
+exports.graphicsReset = function (context, displayColors) {
 	context.stage = new PIXI.Stage(displayColors.OCEAN);
     context.root = new PIXI.DisplayObjectContainer();
     context.stage.addChild(context.root);

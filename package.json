@@ -42,6 +42,7 @@
     "lodash": "^2.4.1",
     "pixi-noise-filter": "0.0.3",
     "pixi.js": "^1.6.1",
+    "phaser": "^2.4.6",
     "shape2d": "0.0.5"
   }
 }

@@ -1,0 +1,81 @@
+<html>
+<head>
+	
+	<script type="text/javascript" src="node_modules/phaser/build/phaser.js"></script>
+	<!-- <script type="text/javascript" src="node_modules/pixi.js/bin/pixi.dev.js"></script> -->
+	<script type="text/javascript" src="bin/voronoi-map.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+
+    var map = voronoiMap.map({width: 1000.0, height: 1000.0});
+    map.newIsland(voronoiMap.islandShape.makeRadial(1), 1);
+    map.go0PlacePoints(100, voronoiMap.pointSelector.generateRandom(map.SIZE.width, map.SIZE.height, map.mapRandom.seed));
+    map.go1BuildGraph();
+    map.assignBiomes();
+    map.go2AssignElevations();
+    map.go3AssignMoisture();
+    map.go4DecorateMap();	
+
+	window.onload = function() {
+		//renderPixi();
+		renderPhaser();
+		//renderCanvas();
+	};	
+
+	function renderCanvas() {
+		var canvas = document.createElement('canvas');
+		canvas.width = map.SIZE.width;
+		canvas.height = map.SIZE.height;
+		var context = canvas.getContext('2d');
+		voronoiMap.renderCanvas.graphicsReset(context, map.SIZE.width, map.SIZE.height, voronoiMap.style.displayColors);
+		voronoiMap.renderCanvas.renderDebugPolygons(context, map, voronoiMap.style.displayColors);
+		document.body.appendChild(canvas);
+
+	}
+
+	function renderPixi() {
+		var context = voronoiMap.renderPixi.createNewCanvasContext(map.SIZE.width, map.SIZE.height)
+		document.body.appendChild(context.renderer.view);
+		voronoiMap.renderPixi.graphicsReset(context, voronoiMap.style.displayColors);
+		voronoiMap.renderPixi.renderDebugPolygons(context, map, voronoiMap.style.displayColors);
+		context.renderer.render(context.stage);
+	}
+
+	function renderPhaser() {
+
+		var game = new Phaser.Game(1000, 1000, Phaser.CANVAS, '', { preload: preload, create: create, update: update});
+
+
+	    function preload () {
+			game.time.advancedTiming = true;
+	    }
+	    
+	    function initDebugging()
+	    {
+
+
+	    }
+
+	    function create () {
+
+
+
+		    var context = game;	    
+		    
+		    voronoiMap.renderPhaser.graphicsReset(context, map.SIZE.width, map.SIZE.height, voronoiMap.style.displayColors);
+		    voronoiMap.renderPhaser.renderDebugPolygons(context, map, voronoiMap.style.displayColors);
+		   	
+
+	    }
+	    
+	    function update() {
+			game.debug.text(this.time.fps || '--', 2, 14, "#00ff00");	    		
+
+	    }	
+
+	}
+	   	  
+	</script>
+</body>
+</html>

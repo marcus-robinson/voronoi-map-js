@@ -15,6 +15,7 @@ window.voronoiMap = {
     renderCore: require('./render-core'),
     renderCanvas: require('./render-canvas'),
     renderPixi: require('./render-pixi'),
+    renderPhaser: require('./render-phaser'),
     roads: require('./roads'),
     style: require('./style'),
     watersheds: require('./watersheds')
