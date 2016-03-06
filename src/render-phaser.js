@@ -66,7 +66,8 @@ exports.renderDebugPolygons = function (context, map, displayColors) {
         _(p.borders).each(function (edge) {
             if (edge.v0 && edge.v1) {
                 if (edge.river > 0) {
-                	graphics.lineStyle(2, displayColors.RIVER);
+                    graphics.lineStyle(edge.river/2, displayColors.RIVER);
+                	//graphics.lineStyle(2, displayColors.RIVER);
                 } else {
                 	graphics.lineStyle(1, 0x000000, 0.2);
                 }
@@ -103,8 +104,6 @@ exports.renderWatersheds = function (context, map, watersheds) {
     var game = context;
     var context = game.context;
     var graphics = game.add.graphics(0, 0);
-
-    graphics = game.add.graphics(0, 0);    
 
     _(map.edges).each(function (edge) {
         if (edge.d0 && edge.d1 && edge.v0 && edge.v1 && !edge.d0.ocean && !edge.d1.ocean) {

@@ -13012,7 +13012,8 @@ exports.renderDebugPolygons = function (context, map, displayColors) {
         _(p.borders).each(function (edge) {
             if (edge.v0 && edge.v1) {
                 if (edge.river > 0) {
-                	graphics.lineStyle(2, displayColors.RIVER);
+                    graphics.lineStyle(edge.river/2, displayColors.RIVER);
+                	//graphics.lineStyle(2, displayColors.RIVER);
                 } else {
                 	graphics.lineStyle(1, 0x000000, 0.2);
                 }
