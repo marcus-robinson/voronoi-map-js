@@ -2,6 +2,7 @@
 <head>
 	
 	<script type="text/javascript" src="node_modules/phaser/build/phaser.js"></script>
+	
 	<!-- <script type="text/javascript" src="node_modules/pixi.js/bin/pixi.dev.js"></script> -->
 	<script type="text/javascript" src="bin/voronoi-map.js"></script>
 	<script type="text/javascript" src="src/rotating-calipers.js"></script>
@@ -47,7 +48,7 @@
 	function renderPhaser() {
 
 		var game = new Phaser.Game(1000, 1000, Phaser.CANVAS, '', { preload: preload, create: create, update: update});
-
+		var quadTree = new Phaser.QuadTree(0,0, map.SIZE.width, map.SIZE.height, 10, 4);
 
 	    function preload () {
 			game.time.advancedTiming = true;
@@ -69,54 +70,167 @@
 		    voronoiMap.renderPhaser.renderDebugPolygons(context, map, voronoiMap.style.displayColors);
 
 
-			// var graphics = game.add.graphics(0, 0);
+			var graphics = game.add.graphics(0, 0);
 
-	  //       var colors = voronoiMap.style.displayColors;
+	        var colors = voronoiMap.style.displayColors;
 
-	  //       for (var centerIndex = 0; centerIndex < map.centers.length; centerIndex++) {
-	  //           var p = map.centers[centerIndex];
-	  //           var x,y,right,bottom;
-	  //           for (var neighborIndex = 0; neighborIndex < p.neighbors.length; neighborIndex++) {
-	  //               let r = p.neighbors[neighborIndex];
-	  //               let edge = map.lookupEdgeFromCenter(p, r);
-	  //               let color = colors[p.biome];
-	  //               let corner0 = edge.v0;
-	  //               let corner1 = edge.v1;
-	  //           }
+	        
 
-   //              graphics.lineStyle(2, 0xFF6600);
-   //              graphics.moveTo(edge.v0.point.x, edge.v0.point.y);
-   //              graphics.lineTo(edge.v1.point.x, edge.v1.point.y);	
+	        for (var centerIndex = 0; centerIndex < map.centers.length; centerIndex++) {
+	        	var points = [];
+	            var p = map.centers[centerIndex];
+	            var x,y,right,bottom;
+	            var hasNullNeighbour = false;
+
+				var min_x = 99999999999999;
+				var min_y = 99999999999999;
+				var max_x = 0;
+				var max_y = 0;
+				var checkMinMax = function(vertice){
+				    	min_x = vertice.x < min_x ? vertice.x : min_x; 
+			    	max_x = vertice.x > max_x ? vertice.x : max_x; 
+			    	min_y = vertice.y < min_y ? vertice.y : min_y; 
+			    	max_y = vertice.y > max_y ? vertice.y : max_y;
+				};
+
+				for (var cornerIndex = 0; cornerIndex < p.corners.length; cornerIndex++){
+					var crnr = p.corners[cornerIndex];
+					checkMinMax(crnr.point);
+
+					points.push([crnr.point.x, crnr.point.y]);
+				}
+
+	            // for (var neighborIndex = 0; neighborIndex < p.neighbors.length; neighborIndex++) {
+	            //    var r = p.neighbors[neighborIndex];
+	            //    var edge = map.lookupEdgeFromCenter(p, r);
+
+	            //    hasNullNeighbour = (!edge.v0 || !edge.v1);
+	               		
+	   	        //     if(hasNullNeighbour)
+		           //  	continue;
+
+	            //    points.push([edge.v0.point.x, edge.v0.point.y]);
+	            //    points.push([edge.v1.point.x, edge.v1.point.y]);
+
+ 
+	            //    checkMinMax(edge.v0.point);
+	            //    checkMinMax(edge.v1.point);
 
 
-			// 	//points = [[283, 252], [421, 182], [399, 328]]
-			// 	if (points.length > 2) {
-			// 		var solver = new RotatingCalipers( points )
-			// 		var hull = solver.convexHull();
-			// 		var maer = solver.minAreaEnclosingRectangle().vertices;
-			// 		ctx.clearRect(0,0, canvas.width, canvas.height);
-			// 		ctx.strokeStyle = "black";
-			// 		ctx.beginPath();
-			//     	ctx.moveTo(hull[0][0], hull[0][1]);
-			// 	    for (var i = 1; i < hull.length; i++) {
-			// 	    	ctx.lineTo(hull[i][0], hull[i][1])
-			// 	    };
-			// 	    ctx.closePath();
-			// 	    ctx.stroke();
-			// 	    ctx.strokeStyle = "blue";
-			// 			ctx.beginPath();
-			// 	    ctx.moveTo(maer[0][0], maer[0][1]);
-			// 	    for (var i = 1; i < maer.length; i++) {
-			// 	    	ctx.lineTo(maer[i][0], maer[i][1])
-			// 	    };
-			// 	    ctx.closePath();
-			// 	    ctx.stroke();
-			// 		for (var i = 0; i < points.length; i++) {
-			// 			ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI, false);
-			// 		};
-			// 	}
-        	//}			    		   	
+	            // }
+
+	            // if(hasNullNeighbour)
+	            // 	continue;
+
+	
+				if (points.length > 2) {
+					var solver = new RotatingCalipers( points )
+					var hull = solver.convexHull();
+					var maer = solver.minAreaEnclosingRectangle().vertices;
+
+					p.hull = points;
+					p.hull = hull;
+
+	       //          graphics.lineStyle(1, 0xFF6600);
+				    // graphics.moveTo(maer[0][0], maer[0][1]);
+				    // for (var i = 1; i < maer.length; i++) {
+				    // 	graphics.lineTo(maer[i][0], maer[i][1]);
+				    // };
+				    // graphics.lineTo(maer[0][0], maer[0][1]);
+
+					
+					// graphics.lineStyle(2, 0xFF00FF);
+				 //    graphics.moveTo(hull[0][0], hull[0][1]);
+				 //    for (var i = 1; i < hull.length; i++) {
+				 //    	graphics.lineTo(hull[i][0], hull[i][1]);
+				 //    };
+				 //    graphics.lineTo(hull[0][0], hull[0][1]);
+
+					// graphics.lineStyle(1, 0x00FF00);
+				 //    graphics.moveTo(points[0][0], points[0][1]);
+				 //    for (var i = 1; i < points.length; i++) {
+				 //    	graphics.lineTo(points[i][0], points[i][1]);
+				 //    };
+				 //    graphics.lineTo(points[0][0], points[0][1]);
+
+
+
+
+
+
+				    // for (var i = 0; i < maer.length; i++) {
+				    // 	min_x = maer[i][0] < min_x ? maer[i][0] : min_x; 
+				    // 	max_x = maer[i][0] > max_x ? maer[i][0] : max_x; 
+				    // 	min_y = maer[i][1] < min_y ? maer[i][1] : min_y; 
+				    // 	max_y = maer[i][1] > max_y ? maer[i][1] : max_y; 				    				    
+				    // };					
+
+
+	       //          graphics.lineStyle(1, 0x0000FF);
+				    // graphics.moveTo(min_x,min_y);				   
+			    	// graphics.lineTo(min_x,max_y);
+			    	// graphics.lineTo(max_x,max_y);
+			    	// graphics.lineTo(max_x,min_y);
+			    	// graphics.lineTo(min_x,min_y);
+					//(min_x,min_y), (min_x,max_y), (max_x,max_y), (max_x,min_y)
+
+					quadTree.insert({x:min_x, y:min_y, right:max_x, bottom:max_y, center:p});
+
+
+				}
+        	}
+
+        	game.input.onDown.add(getBiomeFromPoint);			    		   	
 	    }
+
+	    function getBiomeFromPoint(event) {
+
+	    	var x = event.x;
+	    	var y = event.y;
+        
+        	var candidates = quadTree.retrieve(new Phaser.Rectangle(x, y, 1, 1));
+
+        	var graphics = game.add.graphics(0, 0);
+
+        	for(var i=0; i<candidates.length; i++){
+        		var biome = candidates[i].center;
+
+        		if(inside([x, y], biome.hull)) {
+
+        			var hull = biome.hull;
+        			graphics.lineStyle(2, 0xFF0000);
+				    graphics.moveTo(hull[0][0], hull[0][1]);
+				    for (var j = 1; j < hull.length; j++) {
+				    	graphics.lineTo(hull[j][0], hull[j][1]);
+				    };
+				    graphics.lineTo(hull[0][0], hull[0][1]);
+
+        			console.log(biome);
+        			break;
+        		}
+        	}
+        }
+
+        function inside (point, vs) {
+		    // ray-casting algorithm based on
+		    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+		    
+		    var x = point[0], y = point[1];
+		    
+		    var inside = false;
+		    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+		        var xi = vs[i][0], yi = vs[i][1];
+		        var xj = vs[j][0], yj = vs[j][1];
+		        
+		        var intersect = ((yi > y) != (yj > y))
+		            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+		        if (intersect) inside = !inside;
+		    }
+		    
+		    return inside;
+		}
+
+
 	    
 	    function update() {
 			game.debug.text(this.time.fps || '--', 2, 14, "#00ff00");	    		
